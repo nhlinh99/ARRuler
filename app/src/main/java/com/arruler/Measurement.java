@@ -1,10 +1,13 @@
 package com.arruler;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import android.annotation.SuppressLint;
+
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.app.Activity;
@@ -37,7 +40,7 @@ import java.util.Objects;
 
 import java.lang.*;
 
-public class Measurement extends AppCompatActivity {
+public class Measurement extends AppCompatActivity implements Scene.OnUpdateListener {
 
     private TextView mTextView;
     private static float MIN_OPENGL_VERSION = (float) 3.0;
@@ -75,7 +78,7 @@ public class Measurement extends AppCompatActivity {
     private HashMap<String, AnchorNode> midAnchorNodes;
     private List<List<Node>> fromGroundNodes = new ArrayList<List<Node>>();
 
-    private List multipleDistances = Arrays.asList(Constants.maxNumMultiplePoints,
+    private List<List<TextView>> multipleDistances = Arrays.asList(Constants.maxNumMultiplePoints,
             {ArrayList<TextView>(Constants.maxNumMultiplePoints)});
 
 
@@ -126,7 +129,6 @@ public class Measurement extends AppCompatActivity {
             }
 
         });
-
     }
 
     private void initDistanceTable(){
@@ -152,7 +154,7 @@ public class Measurement extends AppCompatActivity {
                     }
                     else if(i==j){
                         textView.setText("-");
-                        multipleDistances[i-1][j-1] = textView;
+                        multipleDistances.get(i-1).get(j-1) = textView;
                     }
                     else{
                         textView.setText(initCM);
@@ -401,7 +403,7 @@ public class Measurement extends AppCompatActivity {
     }
 
     private void tapDistanceFromGround(HitResult hitResult) {
-        clearAllAnchors();;
+        clearAllAnchors();
         Anchor anchor = hitResult.createAnchor();
         placedAnchors.add(anchor);
 
@@ -434,10 +436,137 @@ public class Measurement extends AppCompatActivity {
                 node.getWorldPosition().z
         ));
         arrow1UpNode.setRenderable(arrow1UpRenderable);
+        arrow1UpNode.setOnTapListener(((hitTestResult, motionEvent) -> {
+            node.setWorldPosition(new Vector3(
+                    node.getWorldPosition().x,
+                    node.getWorldPosition().y + 0.01f,
+                    node.getWorldPosition().z
+            ));
+        })
+        );
 
+        Node arrow1DownNode = new Node();
+        arrow1DownNode.setParent(node);
+        arrow1DownNode.setWorldPosition(new Vector3(
+                node.getWorldPosition().x,
+                node.getWorldPosition().y + 0.08f,
+                node.getWorldPosition().z
+        ));
+        arrow1DownNode.setRenderable(arrow1UpRenderable);
+        arrow1DownNode.setOnTapListener(((hitTestResult, motionEvent) -> {
+                    node.setWorldPosition(new Vector3(
+                            node.getWorldPosition().x,
+                            node.getWorldPosition().y - 0.01f,
+                            node.getWorldPosition().z
+                    ));
+                })
+        );
+
+        Node arrow10UpNode = new Node();
+        arrow10UpNode.setParent(node);
+        arrow10UpNode.setWorldPosition(new Vector3(
+                node.getWorldPosition().x,
+                node.getWorldPosition().y + 0.08f,
+                node.getWorldPosition().z
+        ));
+        arrow10UpNode.setRenderable(arrow1UpRenderable);
+        arrow10UpNode.setOnTapListener(((hitTestResult, motionEvent) -> {
+                    node.setWorldPosition(new Vector3(
+                            node.getWorldPosition().x,
+                            node.getWorldPosition().y - 0.01f,
+                            node.getWorldPosition().z
+                    ));
+                })
+        );
+
+        Node arrow10DownNode = new Node();
+        arrow10DownNode.setParent(node);
+        arrow10DownNode.setWorldPosition(new Vector3(
+                node.getWorldPosition().x,
+                node.getWorldPosition().y + 0.08f,
+                node.getWorldPosition().z
+        ));
+        arrow10DownNode.setRenderable(arrow1UpRenderable);
+        arrow10DownNode.setOnTapListener(((hitTestResult, motionEvent) -> {
+                    node.setWorldPosition(new Vector3(
+                            node.getWorldPosition().x,
+                            node.getWorldPosition().y - 0.01f,
+                            node.getWorldPosition().z
+                    ));
+                })
+        );
+
+        ;
+        fromGroundNodes.add(Arrays.asList(node, arrow1UpNode, arrow1DownNode, arrow10UpNode, arrow10DownNode));
+
+        arFragment.getArSceneView().getScene().addOnUpdateListener(this);
+        arFragment.getArSceneView().getScene().addChild(anchorNode);
+        transformableNode.select();
     }
 
+    private void placeAnchor(HitResult hitResult, Renderable renderable) {
+        Anchor anchor = hitResult.createAnchor();
+        placedAnchors.add(anchor);
 
+        AnchorNode anchorNode = new AnchorNode(anchor);
+        anchorNode.setSmoothed(true);
+        anchorNode.setParent(arFragment.getArSceneView().getScene());
+
+        placedAnchorNodes.add(anchorNode);
+
+        TransformableNode node = new TransformableNode(arFragment.getTransformationSystem()) {{
+            getRotationController().setEnabled(false);
+            getScaleController().setEnabled(false);
+            getTranslationController().setEnabled(true);
+            setRenderable(renderable);
+            setParent(anchorNode);
+        }};
+
+        arFragment.getArSceneView().getScene().addOnUpdateListener(this);
+        arFragment.getArSceneView().getScene().addChild(anchorNode);
+        node.select();
+    }
+
+    private void placeMidAnchor(Pose pose, Renderable renderable) {
+        String midKey = String.format("%d_%d", 0, 1);
+        Anchor anchor = arFragment.getArSceneView().getSession().createAnchor(pose);
+        midAnchors.put(midKey, anchor);
+
+        AnchorNode anchorNode = new AnchorNode();
+        anchorNode.setSmoothed(true);
+        anchorNode.setParent(arFragment.getArSceneView().getScene());
+        midAnchorNodes.put(midKey, anchorNode);
+
+        TransformableNode node = new TransformableNode(arFragment.getTransformationSystem()) {{
+            this.getRotationController().setEnabled(false);
+            this.getScaleController().setEnabled(false);
+            this.getTranslationController().setEnabled(true);
+            this.setRenderable(renderable);
+            setParent(anchorNode);
+        }};
+        arFragment.getArSceneView().getScene().addOnUpdateListener(this);
+        arFragment.getArSceneView().getScene().addChild(anchorNode);
+    }
+
+    private void tapDistanceOf2Points(HitResult hitResult) {
+        if (placedAnchorNodes.size() == 0) {
+            placeAnchor(hitResult, cubeRenderable);
+        }
+        else if (placedAnchorNodes.size() == 1) {
+            placeAnchor(hitResult, cubeRenderable);
+            Vector3 worldPosition0 = placedAnchorNodes.get(0).getWorldPosition();
+            Vector3 worldPosition1 = placedAnchorNodes.get(1).getWorldPosition();
+            float[] midPosition = {
+                    (worldPosition0.x + worldPosition1.x) / 2,
+                    (worldPosition0.y + worldPosition1.y) / 2,
+                    (worldPosition0.z + worldPosition1.z) / 2
+            };
+            float[] quaternion = {0.0f,0.0f,0.0f,0.0f};
+            Pose pose = new Pose(midPosition, quaternion);
+
+            placeMidAnchor(pose, distanceCardViewRenderable);
+        }
+    }
 
     private void tapDistanceOfMultiplePoints(HitResult hitResult) {
         if (placedAnchorNodes.size() >= Constants.maxNumMultiplePoints) {
@@ -447,10 +576,20 @@ public class Measurement extends AppCompatActivity {
                 .builder()
                 .setView(this, R.layout.point_text_layout)
                 .build()
-                .thenAccept(
-
-                )
-
+                .thenAccept(material -> {
+                    material.setShadowReceiver(false);
+                    material.setShadowCaster(false);
+                    pointTextView = (TextView)material.getView();
+                    placeAnchor(hitResult, material);
+                })
+                .exceptionally(throwable -> {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage(throwable.getMessage()).setTitle("Error");
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                    return null;
+                });
+        Log.i(TAG, String.format("Number of anchors: %d", placedAnchorNodes.size()));
     }
 
     private void measureDistanceFromGround() {
@@ -547,21 +686,14 @@ public class Measurement extends AppCompatActivity {
 
     void toastMode() {
         String msg = "Unknown";
-        switch (distanceMode) {
-            case distanceModeArrayList.get(0):
-                msg = "Find plane and tap somewhere";
-                break;
-            case distanceModeArrayList.get(1):
-                msg = "Find plane and tap 2 points";
-                break;
-            case distanceModeArrayList.get(2):
-                msg = "Find plane and tap multiple points";
-                break;
-            case distanceModeArrayList.get(3):
-                msg = "Find plane and tap a point";
-                break;
-            default:
-                break;
+        if (distanceMode == distanceModeArrayList.get(0)) {
+            msg = "Find plane and tap somewhere";
+        } else if (distanceMode == distanceModeArrayList.get(1)) {
+            msg = "Find plane and tap 2 points";
+        } else if (distanceMode == distanceModeArrayList.get(2)) {
+            msg = "Find plane and tap multiple points";
+        } else if (distanceMode == distanceModeArrayList.get(3)) {
+            msg = "Find plane and tap a point";
         }
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
@@ -580,5 +712,18 @@ public class Measurement extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+
+    @SuppressLint("SetTextI18n") @Override
+    public void onUpdate(FrameTime frameTime) {
+        if (distanceMode == distanceModeArrayList.get(1)) {
+            measureDistanceOf2Points();
+        } else if (distanceMode == distanceModeArrayList.get(2)) {
+            measureMultipleDistances();
+        } else if (distanceMode == distanceModeArrayList.get(3)) {
+            measureDistanceFromGround();
+        } else {
+            measureDistanceFromCamera();
+        }
     }
 }
