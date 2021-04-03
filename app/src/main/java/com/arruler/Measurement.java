@@ -227,89 +227,89 @@ public class Measurement extends AppCompatActivity {
         );
 
         ViewRenderable
-            .builder()
-            .setView(this, R.layout.distance_text_layout)
-            .build()
-            .thenAccept( material -> {
-                distanceCardViewRenderable = material;
-                distanceCardViewRenderable.setShadowCaster(false);
-                distanceCardViewRenderable.setShadowReceiver(false);
-            }).exceptionally (
+                .builder()
+                .setView(this, R.layout.distance_text_layout)
+                .build()
+                .thenAccept( material -> {
+                    distanceCardViewRenderable = material;
+                    distanceCardViewRenderable.setShadowCaster(false);
+                    distanceCardViewRenderable.setShadowReceiver(false);
+                }).exceptionally (
                 throwable -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage("Error").setTitle("Error");
                     AlertDialog dialog = builder.create();
                     dialog.show();
                     return null;
-            });
+                });
 
         ViewRenderable
-            .builder()
-            .setView(this, arrow1UpLinearLayout)
-            .build()
-            .thenAccept (material -> {
-                arrow1UpRenderable = material;
-                arrow1UpRenderable.setShadowCaster(false);
-                arrow1UpRenderable.setShadowReceiver(false);
-            }).exceptionally (
+                .builder()
+                .setView(this, arrow1UpLinearLayout)
+                .build()
+                .thenAccept (material -> {
+                    arrow1UpRenderable = material;
+                    arrow1UpRenderable.setShadowCaster(false);
+                    arrow1UpRenderable.setShadowReceiver(false);
+                }).exceptionally (
                 throwable -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage("Error").setTitle("Error");
                     AlertDialog dialog = builder.create();
                     dialog.show();
                     return null;
-            });
+                });
 
         ViewRenderable
-            .builder()
-            .setView(this, arrow1DownLinearLayout)
-            .build()
-            .thenAccept (material -> {
-                arrow1DownRenderable = material;
-                arrow1DownRenderable.setShadowCaster(false);
-                arrow1DownRenderable.setShadowReceiver(false);
-            }).exceptionally (
+                .builder()
+                .setView(this, arrow1DownLinearLayout)
+                .build()
+                .thenAccept (material -> {
+                    arrow1DownRenderable = material;
+                    arrow1DownRenderable.setShadowCaster(false);
+                    arrow1DownRenderable.setShadowReceiver(false);
+                }).exceptionally (
                 throwable -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage("Error").setTitle("Error");
                     AlertDialog dialog = builder.create();
                     dialog.show();
                     return null;
-            });
+                });
 
         ViewRenderable
-            .builder()
-            .setView(this, arrow10UpLinearLayout)
-            .build()
-            .thenAccept (material -> {
-                arrow10UpRenderable = material;
-                arrow10UpRenderable.setShadowCaster(false);
-                arrow10UpRenderable.setShadowReceiver(false);
-            }).exceptionally (
+                .builder()
+                .setView(this, arrow10UpLinearLayout)
+                .build()
+                .thenAccept (material -> {
+                    arrow10UpRenderable = material;
+                    arrow10UpRenderable.setShadowCaster(false);
+                    arrow10UpRenderable.setShadowReceiver(false);
+                }).exceptionally (
                 throwable -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage("Error").setTitle("Error");
                     AlertDialog dialog = builder.create();
                     dialog.show();
                     return null;
-            });
+                });
 
         ViewRenderable
-            .builder()
-            .setView(this, arrow10DownLinearLayout)
-            .build()
-            .thenAccept (material -> {
-                arrow10DownRenderable = material;
-                arrow10DownRenderable.setShadowCaster(false);
-                arrow10DownRenderable.setShadowReceiver(false);
-            }).exceptionally (
+                .builder()
+                .setView(this, arrow10DownLinearLayout)
+                .build()
+                .thenAccept (material -> {
+                    arrow10DownRenderable = material;
+                    arrow10DownRenderable.setShadowCaster(false);
+                    arrow10DownRenderable.setShadowReceiver(false);
+                }).exceptionally (
                 throwable -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setMessage("Error").setTitle("Error");
                     AlertDialog dialog = builder.create();
                     dialog.show();
                     return null;
-            });
+                });
     }
 
     private void configureSpinner(){
@@ -393,30 +393,192 @@ public class Measurement extends AppCompatActivity {
         midAnchorNodes.clear();
         for (int i = 0; i < Constants.maxNumMultiplePoints; i++){
             for (int j = 0; j < Constants.maxNumMultiplePoints; j++){
-                if (multipleDistances[i][j] != null)  multipleDistances[i][j].setText((i == j) ? "-" : initCM);
+                if (multipleDistances[i][j] != null)
+                    multipleDistances[i][j].setText((i == j) ? "-" : initCM);
             }
         }
         fromGroundNodes.clear();
     }
 
-
-    private void toastMode() {
-    }
-
-
     private void tapDistanceFromGround(HitResult hitResult) {
+        clearAllAnchors();;
+        Anchor anchor = hitResult.createAnchor();
+        placedAnchors.add(anchor);
+
+        AnchorNode anchorNode = new AnchorNode(anchor);
+        anchorNode.setSmoothed(true);
+        anchorNode.setParent(arFragment.getArSceneView().getScene());
+        placedAnchorNodes.add(anchorNode);
+
+        TransformableNode transformableNode = new TransformableNode(arFragment.getTransformationSystem());
+        transformableNode.getRotationController().setEnabled(false);
+        transformableNode.getScaleController().setEnabled(false);
+        transformableNode.getTranslationController().setEnabled(true);
+        transformableNode.setRenderable(transformableNode.getRenderable());
+        transformableNode.setParent(anchorNode);
+
+        Node node = new Node();
+        node.setParent(transformableNode);
+        node.setWorldPosition(new Vector3(
+                anchorNode.getWorldPosition().x,
+                anchorNode.getWorldPosition().y,
+                anchorNode.getWorldPosition().z
+        ));
+        node.setRenderable(distanceCardViewRenderable);
+
+        Node arrow1UpNode = new Node();
+        arrow1UpNode.setParent(node);
+        arrow1UpNode.setWorldPosition(new Vector3(
+                node.getWorldPosition().x,
+                node.getWorldPosition().y + 0.1f,
+                node.getWorldPosition().z
+        ));
+        arrow1UpNode.setRenderable(arrow1UpRenderable);
+
     }
+
+
 
     private void tapDistanceOfMultiplePoints(HitResult hitResult) {
+        if (placedAnchorNodes.size() >= Constants.maxNumMultiplePoints) {
+            clearAllAnchors();
+        }
+        ViewRenderable
+                .builder()
+                .setView(this, R.layout.point_text_layout)
+                .build()
+                .thenAccept(
+
+                )
+
     }
 
-    private void tapDistanceOf2Points(HitResult hitResult) {
+    private void measureDistanceFromGround() {
+        if (fromGroundNodes.size() == 0) return;
+        for (List<Node> node: fromGroundNodes) {
+            TextView textView = ((LinearLayout)distanceCardViewRenderable.getView()).
+                    findViewById(R.id.distanceCard);
+            double distanceMeter = node.get(0).getWorldPosition().y + 1;
+            textView.setText(makeDistanceTextWithCM(distanceMeter));
+        }
     }
 
-    private void placeAnchor(HitResult hitResult, ViewRenderable distanceCardViewRenderable) {
+    private void measureDistanceFromCamera() {
+        Frame frame = arFragment.getArSceneView().getArFrame();
+        if (placedAnchorNodes.size() >= 1) {
+            double distanceMeter = calculateDistanceMeter(
+                    placedAnchorNodes.get(0).getWorldPosition(),
+                    frame.getCamera().getPose());
+            measureDistanceOf2Points(distanceMeter);
+        }
     }
 
-    private boolean checkIsSupportedDeviceOrFinish(Measurement measurement) {
+    private void measureDistanceOf2Points() {
+        if (placedAnchorNodes.size() == 2) {
+            double distanceMeter = calculateDistanceMeter(
+                    placedAnchorNodes.get(0).getWorldPosition(),
+                    placedAnchorNodes.get(1).getWorldPosition()
+            );
+            measureDistanceOf2Points(distanceMeter);
+        }
+    }
+
+    private void measureDistanceOf2Points(double distanceMeter) {
+        String distanceTextWithCM = makeDistanceTextWithCM(distanceMeter);
+        TextView textView = ((LinearLayout)distanceCardViewRenderable.getView()).findViewById(R.id.distanceCard);
+        textView.setText(distanceTextWithCM);
+        Log.d(TAG, String.format("Distance: %s", distanceTextWithCM));
+    }
+
+    private void measureMultipleDistances() {
+        if (placedAnchorNodes.size() > 1) {
+            for (int i = 0; i < placedAnchorNodes.size(); ++i) {
+                for (int j = i + 1; j < placedAnchorNodes.size(); ++j) {
+                    double distanceMeter = calculateDistanceMeter(
+                            placedAnchorNodes.get(i).getWorldPosition(),
+                            placedAnchorNodes.get(j).getWorldPosition());
+                    //double distanceCM = changeUnit(distanceMeter, "cm");
+                    String distanceCMFloor = makeDistanceTextWithCM(distanceMeter);
+                    multipleDistance[i][j].setText(distanceCMFloor);
+                    multipleDistance[j][i].setText(distanceCMFloor);
+                }
+            }
+        }
+    }
+
+    private String makeDistanceTextWithCM(double distanceMeter) {
+        double distanceCM = changeUnit(distanceMeter, "cm");
+        String distanceCMFloor = String.format("%.2f cm", distanceCM);
+        return distanceCMFloor;
+    }
+
+    private double calculateDistanceMeter(float x, float y, float z) {
+        return Math.sqrt(Math.pow(x,2) + Math.pow(y,2) + Math.pow(z,2));
+    }
+
+    private double calculateDistanceMeter(Pose objPose0, Pose objPose1) {
+        return calculateDistanceMeter(
+                objPose0.tx() - objPose1.tx(),
+                objPose0.ty() - objPose1.ty(),
+                objPose0.tz() - objPose1.tz());
+    }
+
+    private double calculateDistanceMeter(Vector3 objPose0, Pose objPose1) {
+        return calculateDistanceMeter(
+                objPose0.x - objPose1.tx(),
+                objPose0.y - objPose1.ty(),
+                objPose0.z - objPose1.tz());
+    }
+
+    private double calculateDistanceMeter(Vector3 objPose0, Vector3 objPose1) {
+        return calculateDistanceMeter(
+                objPose0.x - objPose1.x,
+                objPose0.y - objPose1.y,
+                objPose0.z - objPose1.z);
+    }
+
+    double changeUnit(double distanceMeter, String unit) {
+        switch (unit) {
+            case "cm": return distanceMeter * 100;
+            case "mm": return distanceMeter * 1000;
+            default: return distanceMeter;
+        }
+    }
+
+    void toastMode() {
+        String msg = "Unknown";
+        switch (distanceMode) {
+            case distanceModeArrayList.get(0):
+                msg = "Find plane and tap somewhere";
+                break;
+            case distanceModeArrayList.get(1):
+                msg = "Find plane and tap 2 points";
+                break;
+            case distanceModeArrayList.get(2):
+                msg = "Find plane and tap multiple points";
+                break;
+            case distanceModeArrayList.get(3):
+                msg = "Find plane and tap a point";
+                break;
+            default:
+                break;
+        }
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+    }
+
+    boolean checkIsSupportedDeviceOrFinish(Activity activity) {
+        ActivityManager systemService =
+                (ActivityManager)Objects.requireNonNull(activity
+                        .getSystemService(Context.ACTIVITY_SERVICE));
+        String openGLVersionString = systemService.getDeviceConfigurationInfo().getGlEsVersion();
+
+        if (Double.parseDouble(openGLVersionString) < MIN_OPENGL_VERSION) {
+            String msg = String.format("Sceneform requires OpenGL ES %f later", MIN_OPENGL_VERSION);
+            Log.e(TAG, msg);
+            Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
+            activity.finish();
+            return false;
+        }
         return true;
     }
 }
