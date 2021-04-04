@@ -7,7 +7,6 @@ import android.widget.TextView;
 
 import android.annotation.SuppressLint;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.app.Activity;
@@ -78,9 +77,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
     private HashMap<String, AnchorNode> midAnchorNodes;
     private List<List<Node>> fromGroundNodes = new ArrayList<List<Node>>();
 
-    private List<List<TextView>> multipleDistances = Arrays.asList(Constants.maxNumMultiplePoints,
-            {ArrayList<TextView>(Constants.maxNumMultiplePoints)});
-
+    private TextView[][] multipleDistances = new TextView[Constants.maxNumMultiplePoints][Constants.maxNumMultiplePoints];
 
     private String initCM;
     private Button clearButton;
@@ -154,7 +151,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
                     }
                     else if(i==j){
                         textView.setText("-");
-                        multipleDistances.get(i-1).get(j-1) = textView;
+                        multipleDistances[i-1][j-1] = textView;
                     }
                     else{
                         textView.setText(initCM);
@@ -316,7 +313,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
 
     private void configureSpinner(){
         distanceMode = distanceModeArrayList.get(0);
-        distanceModeSpinner = (Spinner) findViewById(R.id.distance_mode_spinner);
+        distanceModeSpinner = findViewById(R.id.distance_mode_spinner);
         ArrayAdapter distanceModeAdapter = new ArrayAdapter(
                 getApplicationContext(),
                 android.R.layout.simple_spinner_item,
@@ -335,14 +332,13 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
                 clearAllAnchors();
                 setMode();
                 toastMode();
+                ViewGroup.LayoutParams layoutParams = multipleDistanceTableLayout.getLayoutParams();
                 if (distanceMode.equals(distanceModeArrayList.get(2))){
-                    ViewGroup.LayoutParams layoutParams = multipleDistanceTableLayout.getLayoutParams();
                     layoutParams.height = Constants.multipleDistanceTableHeight;
                     multipleDistanceTableLayout.setLayoutParams(layoutParams);
                     initDistanceTable();
                 }
                 else {
-                    ViewGroup.LayoutParams layoutParams = multipleDistanceTableLayout.getLayoutParams();
                     layoutParams.height = 0;
                     multipleDistanceTableLayout.setLayoutParams(layoutParams);
                 }
@@ -496,7 +492,6 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
                 })
         );
 
-        ;
         fromGroundNodes.add(Arrays.asList(node, arrow1UpNode, arrow1DownNode, arrow10UpNode, arrow10DownNode));
 
         arFragment.getArSceneView().getScene().addOnUpdateListener(this);
@@ -529,7 +524,8 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
 
     private void placeMidAnchor(Pose pose, Renderable renderable) {
         String midKey = String.format("%d_%d", 0, 1);
-        Anchor anchor = arFragment.getArSceneView().getSession().createAnchor(pose);
+        Anchor anchor = Objects.requireNonNull(arFragment.getArSceneView().getSession()).
+                createAnchor(pose);
         midAnchors.put(midKey, anchor);
 
         AnchorNode anchorNode = new AnchorNode();
@@ -580,6 +576,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
                     material.setShadowReceiver(false);
                     material.setShadowCaster(false);
                     pointTextView = (TextView)material.getView();
+                    pointTextView.setText(String.valueOf(placedAnchors.size()));
                     placeAnchor(hitResult, material);
                 })
                 .exceptionally(throwable -> {
@@ -607,7 +604,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
         if (placedAnchorNodes.size() >= 1) {
             double distanceMeter = calculateDistanceMeter(
                     placedAnchorNodes.get(0).getWorldPosition(),
-                    frame.getCamera().getPose());
+                    Objects.requireNonNull(frame).getCamera().getPose());
             measureDistanceOf2Points(distanceMeter);
         }
     }
@@ -638,8 +635,8 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
                             placedAnchorNodes.get(j).getWorldPosition());
                     //double distanceCM = changeUnit(distanceMeter, "cm");
                     String distanceCMFloor = makeDistanceTextWithCM(distanceMeter);
-                    multipleDistance[i][j].setText(distanceCMFloor);
-                    multipleDistance[j][i].setText(distanceCMFloor);
+                    multipleDistances[i][j].setText(distanceCMFloor);
+                    multipleDistances[j][i].setText(distanceCMFloor);
                 }
             }
         }
@@ -647,8 +644,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
 
     private String makeDistanceTextWithCM(double distanceMeter) {
         double distanceCM = changeUnit(distanceMeter, "cm");
-        String distanceCMFloor = String.format("%.2f cm", distanceCM);
-        return distanceCMFloor;
+        return String.format("%.2f cm", distanceCM);
     }
 
     private double calculateDistanceMeter(float x, float y, float z) {
@@ -686,13 +682,13 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
 
     void toastMode() {
         String msg = "Unknown";
-        if (distanceMode == distanceModeArrayList.get(0)) {
+        if (distanceMode.equals(distanceModeArrayList.get(0))) {
             msg = "Find plane and tap somewhere";
-        } else if (distanceMode == distanceModeArrayList.get(1)) {
+        } else if (distanceMode.equals(distanceModeArrayList.get(1))) {
             msg = "Find plane and tap 2 points";
-        } else if (distanceMode == distanceModeArrayList.get(2)) {
+        } else if (distanceMode.equals(distanceModeArrayList.get(2))) {
             msg = "Find plane and tap multiple points";
-        } else if (distanceMode == distanceModeArrayList.get(3)) {
+        } else if (distanceMode.equals(distanceModeArrayList.get(3))) {
             msg = "Find plane and tap a point";
         }
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
@@ -716,11 +712,11 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
 
     @SuppressLint("SetTextI18n") @Override
     public void onUpdate(FrameTime frameTime) {
-        if (distanceMode == distanceModeArrayList.get(1)) {
+        if (distanceMode.equals(distanceModeArrayList.get(1))) {
             measureDistanceOf2Points();
-        } else if (distanceMode == distanceModeArrayList.get(2)) {
+        } else if (distanceMode.equals(distanceModeArrayList.get(2))) {
             measureMultipleDistances();
-        } else if (distanceMode == distanceModeArrayList.get(3)) {
+        } else if (distanceMode.equals(distanceModeArrayList.get(3))) {
             measureDistanceFromGround();
         } else {
             measureDistanceFromCamera();
