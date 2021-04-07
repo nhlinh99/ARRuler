@@ -1,33 +1,47 @@
 package com.arruler;
 
-import android.os.Build;
-import android.os.Bundle;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
 import android.annotation.SuppressLint;
-
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.*;
-import com.google.ar.core.*;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.ar.core.Anchor;
+import com.google.ar.core.Frame;
+import com.google.ar.core.HitResult;
+import com.google.ar.core.Plane;
+import com.google.ar.core.Pose;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.math.Vector3;
-import com.google.ar.sceneform.rendering.*;
+import com.google.ar.sceneform.rendering.Color;
+import com.google.ar.sceneform.rendering.MaterialFactory;
+import com.google.ar.sceneform.rendering.ModelRenderable;
+import com.google.ar.sceneform.rendering.Renderable;
+import com.google.ar.sceneform.rendering.ShapeFactory;
+import com.google.ar.sceneform.rendering.ViewRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
-import com.google.ar.sceneform.rendering.Color;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,11 +51,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import java.lang.*;
-
 public class Measurement extends AppCompatActivity implements Scene.OnUpdateListener {
 
-    private static String TAG = Measurement.class.getSimpleName();
+    private static final String TAG = Measurement.class.getSimpleName();
 
     private ArFragment arFragment = null;
     private TextView distanceModeTextView = null;
@@ -49,15 +61,11 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
 
     private LinearLayout arrow1UpLinearLayout;
     private LinearLayout arrow1DownLinearLayout;
-    private ImageView arrow1UpView;
-    private ImageView arrow1DownView;
     private Renderable arrow1UpRenderable;
     private Renderable arrow1DownRenderable;
 
     private LinearLayout arrow10UpLinearLayout;
     private LinearLayout arrow10DownLinearLayout;
-    private ImageView arrow10UpView;
-    private ImageView arrow10DownView;
     private Renderable arrow10UpRenderable;
     private Renderable arrow10DownRenderable;
 
@@ -65,20 +73,18 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
 
     private ModelRenderable cubeRenderable;
     private ViewRenderable distanceCardViewRenderable;
-    private Spinner distanceModeSpinner;
-    private List<String> distanceModeArrayList = new ArrayList<String>();
+    private final List<String> distanceModeArrayList = new ArrayList<>();
     private String distanceMode = "";
 
-    private List<Anchor> placedAnchors = new ArrayList<Anchor>();
-    private List<AnchorNode> placedAnchorNodes = new ArrayList<AnchorNode>();
-    private HashMap<String, Anchor> midAnchors = new HashMap<String, Anchor>();
-    private HashMap<String, AnchorNode> midAnchorNodes = new HashMap<String, AnchorNode>(   );
-    private List<List<Node>> fromGroundNodes = new ArrayList<List<Node>>();
+    private final List<Anchor> placedAnchors = new ArrayList<>();
+    private final List<AnchorNode> placedAnchorNodes = new ArrayList<>();
+    private final HashMap<String, Anchor> midAnchors = new HashMap<>();
+    private final HashMap<String, AnchorNode> midAnchorNodes = new HashMap<>();
+    private final List<List<Node>> fromGroundNodes = new ArrayList<>();
 
-    private TextView[][] multipleDistances = new TextView[Constants.maxNumMultiplePoints][Constants.maxNumMultiplePoints];
+    private final TextView[][] multipleDistances = new TextView[Constants.maxNumMultiplePoints][Constants.maxNumMultiplePoints];
 
     private String initCM;
-    private Button clearButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +132,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
         });
     }
 
+    @SuppressLint("SetTextI18n")
     private void initDistanceTable(){
         for (int i = 0; i < Constants.maxNumMultiplePoints+1; i++){
             TableRow tableRow = new TableRow(this);
@@ -168,7 +175,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
         arrow1UpLinearLayout.setOrientation(LinearLayout.VERTICAL);
 
         arrow1UpLinearLayout.setGravity(Gravity.CENTER);
-        arrow1UpView = new ImageView(this);
+        ImageView arrow1UpView = new ImageView(this);
         arrow1UpView.setImageResource(R.drawable.arrow_1up);
         arrow1UpLinearLayout.addView(arrow1UpView,
                 Constants.arrowViewSize,
@@ -177,7 +184,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
         arrow1DownLinearLayout = new LinearLayout(this);
         arrow1DownLinearLayout.setOrientation(LinearLayout.VERTICAL);
         arrow1DownLinearLayout.setGravity(Gravity.CENTER);
-        arrow1DownView = new ImageView(this);
+        ImageView arrow1DownView = new ImageView(this);
         arrow1DownView.setImageResource(R.drawable.arrow_1down);
         arrow1DownLinearLayout.addView(arrow1DownView,
                 Constants.arrowViewSize,
@@ -186,7 +193,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
         arrow10UpLinearLayout = new LinearLayout(this);
         arrow10UpLinearLayout.setOrientation(LinearLayout.VERTICAL);
         arrow10UpLinearLayout.setGravity(Gravity.CENTER);
-        arrow10UpView = new ImageView(this);
+        ImageView arrow10UpView = new ImageView(this);
         arrow10UpView.setImageResource(R.drawable.arrow_10up);
         arrow10UpLinearLayout.addView(arrow10UpView,
                 Constants.arrowViewSize,
@@ -195,7 +202,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
         arrow10DownLinearLayout = new LinearLayout(this);
         arrow10DownLinearLayout.setOrientation(LinearLayout.VERTICAL);
         arrow10DownLinearLayout.setGravity(Gravity.CENTER);
-        arrow10DownView = new ImageView(this);
+        ImageView arrow10DownView = new ImageView(this);
         arrow10DownView.setImageResource(R.drawable.arrow_10down);
         arrow10DownLinearLayout.addView(arrow10DownView,
                 Constants.arrowViewSize,
@@ -216,7 +223,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
         }).exceptionally (
                 throwable -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("Error").setTitle("Error");
+                    builder.setMessage(throwable.getMessage()).setTitle("Error");
                     AlertDialog dialog = builder.create();
                     dialog.show();
                     return null;
@@ -234,7 +241,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
                 }).exceptionally (
                 throwable -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("Error").setTitle("Error");
+                    builder.setMessage(throwable.getMessage()).setTitle("Error");
                     AlertDialog dialog = builder.create();
                     dialog.show();
                     return null;
@@ -251,7 +258,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
                 }).exceptionally (
                 throwable -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("Error").setTitle("Error");
+                    builder.setMessage(throwable.getMessage()).setTitle("Error");
                     AlertDialog dialog = builder.create();
                     dialog.show();
                     return null;
@@ -268,7 +275,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
                 }).exceptionally (
                 throwable -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("Error").setTitle("Error");
+                    builder.setMessage(throwable.getMessage()).setTitle("Error");
                     AlertDialog dialog = builder.create();
                     dialog.show();
                     return null;
@@ -285,7 +292,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
                 }).exceptionally (
                 throwable -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("Error").setTitle("Error");
+                    builder.setMessage(throwable.getMessage()).setTitle("Error");
                     AlertDialog dialog = builder.create();
                     dialog.show();
                     return null;
@@ -302,7 +309,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
                 }).exceptionally (
                 throwable -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("Error").setTitle("Error");
+                    builder.setMessage(throwable.getMessage()).setTitle("Error");
                     AlertDialog dialog = builder.create();
                     dialog.show();
                     return null;
@@ -311,8 +318,8 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
 
     private void configureSpinner(){
         distanceMode = distanceModeArrayList.get(0);
-        distanceModeSpinner = findViewById(R.id.distance_mode_spinner);
-        ArrayAdapter distanceModeAdapter = new ArrayAdapter(
+        Spinner distanceModeSpinner = findViewById(R.id.distance_mode_spinner);
+        ArrayAdapter<String> distanceModeAdapter = new ArrayAdapter<>(
                 getApplicationContext(),
                 android.R.layout.simple_spinner_item,
                 distanceModeArrayList
@@ -357,13 +364,8 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
     }
 
     private void clearButton(){
-        clearButton = findViewById(R.id.clearButton);
-        clearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clearAllAnchors();
-            }
-        });
+        Button clearButton = findViewById(R.id.clearButton);
+        clearButton.setOnClickListener(v -> clearAllAnchors());
     }
 
     private void clearAllAnchors(){
@@ -371,17 +373,16 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
         for (AnchorNode anchorNode : placedAnchorNodes){
             arFragment.getArSceneView().getScene().removeChild(anchorNode);
             anchorNode.setEnabled(false);
-            anchorNode.getAnchor().detach();
+            Objects.requireNonNull(anchorNode.getAnchor()).detach();
             anchorNode.setParent(null);
         }
         placedAnchorNodes.clear();
         midAnchors.clear();
         for (Map.Entry<String, AnchorNode> entry : midAnchorNodes.entrySet()){
-            String k = entry.getKey();
             AnchorNode anchorNode = entry.getValue();
             arFragment.getArSceneView().getScene().removeChild(anchorNode);
             anchorNode.setEnabled(false);
-            anchorNode.getAnchor().detach();
+            Objects.requireNonNull(anchorNode.getAnchor()).detach();
             anchorNode.setParent(null);
         }
 
@@ -429,13 +430,11 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
                 node.getWorldPosition().z
         ));
         arrow1UpNode.setRenderable(arrow1UpRenderable);
-        arrow1UpNode.setOnTapListener(((hitTestResult, motionEvent) -> {
-            node.setWorldPosition(new Vector3(
-                    node.getWorldPosition().x,
-                    node.getWorldPosition().y + 0.01f,
-                    node.getWorldPosition().z
-            ));
-        })
+        arrow1UpNode.setOnTapListener(((hitTestResult, motionEvent) -> node.setWorldPosition(new Vector3(
+                node.getWorldPosition().x,
+                node.getWorldPosition().y + 0.01f,
+                node.getWorldPosition().z
+        )))
         );
 
         Node arrow1DownNode = new Node();
@@ -446,13 +445,11 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
                 node.getWorldPosition().z
         ));
         arrow1DownNode.setRenderable(arrow1UpRenderable);
-        arrow1DownNode.setOnTapListener(((hitTestResult, motionEvent) -> {
-                    node.setWorldPosition(new Vector3(
-                            node.getWorldPosition().x,
-                            node.getWorldPosition().y - 0.01f,
-                            node.getWorldPosition().z
-                    ));
-                })
+        arrow1DownNode.setOnTapListener(((hitTestResult, motionEvent) -> node.setWorldPosition(new Vector3(
+                node.getWorldPosition().x,
+                node.getWorldPosition().y - 0.01f,
+                node.getWorldPosition().z
+        )))
         );
 
         Node arrow10UpNode = new Node();
@@ -463,13 +460,11 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
                 node.getWorldPosition().z
         ));
         arrow10UpNode.setRenderable(arrow1UpRenderable);
-        arrow10UpNode.setOnTapListener(((hitTestResult, motionEvent) -> {
-                    node.setWorldPosition(new Vector3(
-                            node.getWorldPosition().x,
-                            node.getWorldPosition().y - 0.01f,
-                            node.getWorldPosition().z
-                    ));
-                })
+        arrow10UpNode.setOnTapListener(((hitTestResult, motionEvent) -> node.setWorldPosition(new Vector3(
+                node.getWorldPosition().x,
+                node.getWorldPosition().y - 0.01f,
+                node.getWorldPosition().z
+        )))
         );
 
         Node arrow10DownNode = new Node();
@@ -480,13 +475,11 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
                 node.getWorldPosition().z
         ));
         arrow10DownNode.setRenderable(arrow1UpRenderable);
-        arrow10DownNode.setOnTapListener(((hitTestResult, motionEvent) -> {
-                    node.setWorldPosition(new Vector3(
-                            node.getWorldPosition().x,
-                            node.getWorldPosition().y - 0.01f,
-                            node.getWorldPosition().z
-                    ));
-                })
+        arrow10DownNode.setOnTapListener(((hitTestResult, motionEvent) -> node.setWorldPosition(new Vector3(
+                node.getWorldPosition().x,
+                node.getWorldPosition().y - 0.01f,
+                node.getWorldPosition().z
+        )))
         );
 
         fromGroundNodes.add(Arrays.asList(node, arrow1UpNode, arrow1DownNode, arrow10UpNode, arrow10DownNode));
@@ -520,12 +513,12 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
     }
 
     private void placeMidAnchor(Pose pose, Renderable renderable) {
-        String midKey = String.format("%d_%d", 0, 1);
+        @SuppressLint("DefaultLocale") String midKey = String.format("%d_%d", 0, 1);
         Anchor anchor = Objects.requireNonNull(arFragment.getArSceneView().getSession()).
                 createAnchor(pose);
         midAnchors.put(midKey, anchor);
 
-        AnchorNode anchorNode = new AnchorNode();
+        AnchorNode anchorNode = new AnchorNode(anchor);
         anchorNode.setSmoothed(true);
         anchorNode.setParent(arFragment.getArSceneView().getScene());
         midAnchorNodes.put(midKey, anchorNode);
@@ -563,6 +556,8 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
             clearAllAnchors();
             placeAnchor(hitResult, cubeRenderable);
         }
+
+        System.out.println("Number of placed anchor nodes" + placedAnchorNodes.size());
     }
 
     private void tapDistanceOfMultiplePoints(HitResult hitResult) {
@@ -643,6 +638,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
         }
     }
 
+    @SuppressLint("DefaultLocale")
     private String makeDistanceTextWithCM(double distanceMeter) {
         double distanceCM = changeUnit(distanceMeter, "cm");
         return String.format("%.2f cm", distanceCM);
@@ -702,7 +698,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
         String openGLVersionString = systemService.getDeviceConfigurationInfo().getGlEsVersion();
 
         if (Double.parseDouble(openGLVersionString) < Constants.MIN_OPENGL_VERSION) {
-            String msg = String.format("Sceneform requires OpenGL ES %f later", Constants.MIN_OPENGL_VERSION);
+            @SuppressLint("DefaultLocale") String msg = String.format("Sceneform requires OpenGL ES %f later", Constants.MIN_OPENGL_VERSION);
             Log.e(TAG, msg);
             Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
             activity.finish();
