@@ -71,8 +71,8 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
 
     private List<Anchor> placedAnchors = new ArrayList<Anchor>();
     private List<AnchorNode> placedAnchorNodes = new ArrayList<AnchorNode>();
-    private HashMap<String, Anchor> midAnchors;
-    private HashMap<String, AnchorNode> midAnchorNodes;
+    private HashMap<String, Anchor> midAnchors = new HashMap<String, Anchor>();
+    private HashMap<String, AnchorNode> midAnchorNodes = new HashMap<String, AnchorNode>(   );
     private List<List<Node>> fromGroundNodes = new ArrayList<List<Node>>();
 
     private TextView[][] multipleDistances = new TextView[Constants.maxNumMultiplePoints][Constants.maxNumMultiplePoints];
