@@ -41,12 +41,10 @@ import java.lang.*;
 
 public class Measurement extends AppCompatActivity implements Scene.OnUpdateListener {
 
-    private TextView mTextView;
-    private static float MIN_OPENGL_VERSION = (float) 3.0;
     private static String TAG = Measurement.class.getSimpleName();
 
-    private ArFragment arFragment = new ArFragment();
-    private TextView distanceModeTextView;
+    private ArFragment arFragment = null;
+    private TextView distanceModeTextView = null;
     private TextView pointTextView;
 
     private LinearLayout arrow1UpLinearLayout;
@@ -87,15 +85,15 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
         super.onCreate(savedInstanceState);
         if (!checkIsSupportedDeviceOrFinish(this)) {
             Toast.makeText(getApplicationContext(), "Device not supported", Toast.LENGTH_LONG).show();
-        } ;
+        }
 
         setContentView(R.layout.activity_measurement);
         String[] distanceModeArray = getResources().getStringArray(R.array.distance_mode);
         Collections.addAll(distanceModeArrayList, distanceModeArray);
 
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
-        distanceModeTextView = (TextView) findViewById(R.id.distance_view);
-        multipleDistanceTableLayout = (TableLayout) findViewById(R.id.multiple_distance_table);
+        distanceModeTextView = findViewById(R.id.distance_view);
+        multipleDistanceTableLayout = findViewById(R.id.multiple_distance_table);
 
         initCM = getResources().getString(R.string.initCM);
 
@@ -370,7 +368,6 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
 
     private void clearAllAnchors(){
         placedAnchors.clear();
-
         for (AnchorNode anchorNode : placedAnchorNodes){
             arFragment.getArSceneView().getScene().removeChild(anchorNode);
             anchorNode.setEnabled(false);
@@ -562,6 +559,10 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
 
             placeMidAnchor(pose, distanceCardViewRenderable);
         }
+        else {
+            clearAllAnchors();
+            placeAnchor(hitResult, cubeRenderable);
+        }
     }
 
     private void tapDistanceOfMultiplePoints(HitResult hitResult) {
@@ -594,7 +595,7 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
         for (List<Node> node: fromGroundNodes) {
             TextView textView = ((LinearLayout)distanceCardViewRenderable.getView()).
                     findViewById(R.id.distanceCard);
-            double distanceMeter = node.get(0).getWorldPosition().y + 1;
+            double distanceMeter = node.get(0).getWorldPosition().y + 1.0f;
             textView.setText(makeDistanceTextWithCM(distanceMeter));
         }
     }
@@ -700,8 +701,8 @@ public class Measurement extends AppCompatActivity implements Scene.OnUpdateList
                         .getSystemService(Context.ACTIVITY_SERVICE));
         String openGLVersionString = systemService.getDeviceConfigurationInfo().getGlEsVersion();
 
-        if (Double.parseDouble(openGLVersionString) < MIN_OPENGL_VERSION) {
-            String msg = String.format("Sceneform requires OpenGL ES %f later", MIN_OPENGL_VERSION);
+        if (Double.parseDouble(openGLVersionString) < Constants.MIN_OPENGL_VERSION) {
+            String msg = String.format("Sceneform requires OpenGL ES %f later", Constants.MIN_OPENGL_VERSION);
             Log.e(TAG, msg);
             Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
             activity.finish();
