@@ -5,7 +5,7 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
 
-    <uses-feature android:name="android.hardware.camera.ar"/>
+    <uses-feature android:name="android.hardware.camera.ar" />
 
     <application
         android:allowBackup="true"
@@ -16,14 +16,9 @@
         android:theme="@style/Theme.ARRuler"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <activity android:name=".Measurement" />
-
         <activity
-            android:name=".ArcoreMeasurement"
-            android:configChanges="orientation|screenSize"
-            android:exported="true"
-            android:screenOrientation="locked"
-            android:theme="@style/Theme.AppCompat.NoActionBar">
+            android:name=".MenuActivity"
+            android:screenOrientation="locked">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,6 +26,21 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ViewRender3D.Render_Sketch_Room"
+            android:configChanges="orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="locked"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+        </activity>
+
+
+        <activity
+            android:name=".Measuring_room"
+            android:configChanges="orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="locked"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
 
         <meta-data
             android:name="com.google.ar.core"
