@@ -109,7 +109,7 @@ public class Measuring_room extends AppCompatActivity implements Scene.OnUpdateL
     private boolean thread_button = false; //thread happened in button event
 
     private float height_of_room = 0;
-    private final float epsilon = (float) 0.06; // almost equal
+    private final float epsilon = (float) 0.05; // almost equal
 
     private final ArrayList<List<Float>> room_corner_transfer_to_render = new ArrayList<>();
     private final ArrayList<List<List<Float>>> doors_coordinate_transfer_to_render = new ArrayList<>();
@@ -269,7 +269,7 @@ public class Measuring_room extends AppCompatActivity implements Scene.OnUpdateL
                         ViewRenderable
                                 .builder()
                                 .setView(this, R.layout.distance_table_room)
-                                .setSizer(new DpToMetersViewSizer(420))
+                                .setSizer(new DpToMetersViewSizer(410))
                                 .build()
                                 .thenAccept(material -> {
                                     distanceCardViewRenderable = material;
@@ -314,7 +314,7 @@ public class Measuring_room extends AppCompatActivity implements Scene.OnUpdateL
                         ViewRenderable
                                 .builder()
                                 .setView(this, R.layout.distance_table_room)
-                                .setSizer(new DpToMetersViewSizer(420))
+                                .setSizer(new DpToMetersViewSizer(410))
                                 .build()
                                 .thenAccept(material -> {
                                     distanceCardViewRenderable = material;
@@ -377,7 +377,7 @@ public class Measuring_room extends AppCompatActivity implements Scene.OnUpdateL
                         ViewRenderable
                                 .builder()
                                 .setView(this, R.layout.distance_table_room)
-                                .setSizer(new DpToMetersViewSizer(420))
+                                .setSizer(new DpToMetersViewSizer(410))
                                 .build()
                                 .thenAccept(material -> {
                                     distanceCardViewRenderable = material;
@@ -429,7 +429,7 @@ public class Measuring_room extends AppCompatActivity implements Scene.OnUpdateL
                     ViewRenderable
                             .builder()
                             .setView(this, R.layout.distance_table_room)
-                            .setSizer(new DpToMetersViewSizer(420))
+                            .setSizer(new DpToMetersViewSizer(410))
                             .build()
                             .thenAccept(material -> {
                                 distanceCardViewRenderable = material;
@@ -516,7 +516,7 @@ public class Measuring_room extends AppCompatActivity implements Scene.OnUpdateL
                 ViewRenderable
                         .builder()
                         .setView(this, R.layout.distance_table_room)
-                        .setSizer(new DpToMetersViewSizer(420))
+                        .setSizer(new DpToMetersViewSizer(410))
                         .build()
                         .thenAccept(material -> {
                             distanceCardViewRenderable = material;
@@ -976,7 +976,7 @@ public class Measuring_room extends AppCompatActivity implements Scene.OnUpdateL
                 .thenAccept(
                         material -> {
                             LineBetweenAnchor = ShapeFactory.makeCube(
-                                    new Vector3(0.005f, 0.005f, line_size),
+                                    new Vector3(0.003f, 0.003f, line_size),
                                     Vector3.zero(),
                                     material);
                             LineBetweenAnchor.setShadowCaster(false);
@@ -1081,7 +1081,7 @@ public class Measuring_room extends AppCompatActivity implements Scene.OnUpdateL
                     .thenAccept(
                             material -> {
                                 RectangleRender = ShapeFactory.makeCube(
-                                        new Vector3(0.005f, length, width),
+                                        new Vector3(0.004f, length, width),
                                         Vector3.zero(),
                                         material);
                                 RectangleRender.setShadowCaster(false);
@@ -1201,7 +1201,7 @@ public class Measuring_room extends AppCompatActivity implements Scene.OnUpdateL
                 .thenAccept(
                         material -> {
                             placedAnchor = ShapeFactory.makeSphere(
-                                    0.015f,
+                                    0.01f,
                                     Vector3.zero(),
                                     material);
                             placedAnchor.setShadowCaster(false);
@@ -1211,7 +1211,7 @@ public class Measuring_room extends AppCompatActivity implements Scene.OnUpdateL
         ViewRenderable
                 .builder()
                 .setView(this, R.layout.distance_table_room)
-                .setSizer(new DpToMetersViewSizer(420))
+                .setSizer(new DpToMetersViewSizer(410))
                 .build()
                 .thenAccept(material -> {
                     RoomCardViewRenderable = material;
@@ -1229,7 +1229,7 @@ public class Measuring_room extends AppCompatActivity implements Scene.OnUpdateL
         ViewRenderable
                 .builder()
                 .setView(this, R.layout.distance_table_room)
-                .setSizer(new DpToMetersViewSizer(420))
+                .setSizer(new DpToMetersViewSizer(410))
                 .build()
                 .thenAccept(material -> {
                     ObjectCardViewRenderable = material;
