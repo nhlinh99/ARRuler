@@ -1,33 +1,48 @@
 # ARRuler
 
-ARRuler is an app that can measure distance of two random points as well as simulating AR view for users to measure room, object, door, window...
+ARRuler là một ứng dụng có thể đo khoảng cách của hai điểm ngẫu nhiên cũng như mô phỏng chế độ xem AR để người dùng đo phòng, vật thể, cửa ra vào, cửa sổ ...
 
-This project is just the demo for our Graduate Thesis, so the effectiveness and management of codes is not included in this project. Our project uses ARCore, created by Google, to develop ARRuler application.
+Dự án này chỉ là bản demo cho Luận văn tốt nghiệp , vì vậy tính hiệu quả và quản lý của mã nguồn không được bao gồm trong dự án này. Dự án sử dụng ARCore, do Google tạo ra, để phát triển ứng dụng ARRuler.
 
-## Installation
+## Cài đặt
 
-- Firstly, in order to use this source, developer has to download android studio at: https://developer.android.com/studio
+- Đầu tiên, để sử dụng mã nguồn này, nhà phát triển phải tải xuống android studio tại: https://developer.android.com/studio
 
-- And then, just clone this repo to your local and open it in android studio
+- Và sau đó, sao chép repo này vào máy tính của bạn và mở nó trong studio android
 
-- Finally, connect the usb cable to your mobile phone and click on Run app
+- Cuối cùng, kết nối cáp usb với điện thoại di động của bạn và nhấp vào Chạy ứng dụng
 
 ## Demo
 
-There are several features in the application:
-- Measuring distance of two points, which are placed by user's tap on button
-- Measuring objects (width, length, height). The application also shows the cube surrounding the object chosen. After that, an information table will appear above the object
-- Measuring room (length of each line, area, volume). The application will show the information table of room at the end of measurement
-- Measuring door (length, height, area).
-- Generate 3D view of whole room, including doors.
-- Measuring window (on update)
+Có một số tính năng trong ứng dụng:
+- Đo khoảng cách của hai điểm, được đặt bằng việc chọn nút bấm của người dùng
+- Đo vật thể (chiều rộng, chiều dài, chiều cao). Ứng dụng cũng hiển thị hình khối bao quanh vật thể. Sau đó, một bảng thông tin sẽ xuất hiện phía trên đối tượng
+- Đo phòng (độ dài từng đoạn thẳng, diện tích, thể tích). Ứng dụng sẽ hiển thị bảng thông tin về phòng khi kết thúc quá trình đo
+- Đo cửa (chiều dài, chiều cao, diện tích).
+- Tạo chế độ xem 3D của toàn bộ căn phòng, bao gồm cả cửa ra vào.
+- Đo cửa sổ (chưa cập nhật)
 
-## How to use
+## Cách sử dụng
 
-- Firstly, the user face the camera to the floor surface, make sure the floor is flat and lightened
-- After that, the user tap the surface, and then tap the round button to measure the height of the room
-- There is a setting button, which user can choose to measure room or object seperately.
-- When user finish measuring room, click on the generate button to see the 3D view of the room.
+- Đầu tiên, người dùng hướng camera xuống bề mặt sàn, đảm bảo sàn phẳng và ánh sáng đầy đủ.
+- Sau đó, người dùng chạm vào bề mặt, rồi chạm vào nút bấm để đo chiều cao của căn phòng
+- Có một nút cài đặt, người dùng có thể chọn để đo phòng hoặc đo vật thể.
+- Khi người dùng kết thúc việc đo phòng, nhấp vào nút Generate để xem hình ảnh 3D của phòng.
 
-## License
-[HCMUS]
+## Phiên bản Gradle
+```text
+androidx.appcompat:appcompat:1.2.0
+androidx.constraintlayout:constraintlayout:2.0.4
+androidx.core:core-ktx:1.3.2
+com.google.ar.sceneform:core:1.17.1
+com.google.ar:core:1.23.0
+androidx.test.espresso:espresso-core:3.3.0
+androidx.test.ext:junit:1.1.2
+junit:junit:4.13.2
+junit:junit:4.13.2
+com.google.android.material:material:1.3.0
+androidx.recyclerview:recyclerview:1.1.0
+com.google.ar.sceneform.ux:sceneform-ux:1.17.1
+```
+## Bản quyền
+[HCMUS](https://hcmus.edu.vn/)
